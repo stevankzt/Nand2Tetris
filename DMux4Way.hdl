@@ -1,0 +1,32 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/01/DMux4Way.hdl
+
+/**
+ * 4-way demultiplexor:
+ * {a, b, c, d} = {in, 0, 0, 0} if sel == 00
+ *                {0, in, 0, 0} if sel == 01
+ *                {0, 0, in, 0} if sel == 10
+ *                {0, 0, 0, in} if sel == 11
+ */
+
+CHIP DMux4Way {
+    IN in, sel[2];
+    OUT a, b, c, d;
+
+    PARTS:
+    // Первый уровень демультиплексирования: разделение по старшему биту sel[1]
+    // Если sel[1] = 0: out1 = in, out2 = 0 (группа a,b)
+    // Если sel[1] = 1: out1 = 0, out2 = in (группа c,d)
+    DMux(in=in, sel=sel[1], a=AB, b=CD);
+
+    // Второй уровень демультиплексирования: разделение по младшему биту sel[0]
+    // Для первой группы (a,b): если sel[0] = 0 -> a = out1, b = 0
+    //                       если sel[0] = 1 -> a = 0, b = out1
+    DMux(in=AB, sel=sel[0], a=a, b=b);
+    
+    // Для второй группы (c,d): если sel[0] = 0 -> c = out2, d = 0
+    //                       если sel[0] = 1 -> c = 0, d = out2
+    DMux(in=CD, sel=sel[0], a=c, b=d);
+}
